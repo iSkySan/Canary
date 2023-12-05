@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: iskysan/voting-app
+  repository: joffreydupire/simplon-voting-app
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
@@ -44,7 +44,7 @@ service:
   port: 8080
 
 ingress:
-  enabled: false
+  enabled: true
   className: "nginx"
   annotations: {}
     # kubernetes.io/ingress.class: nginx
@@ -96,3 +96,16 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+env:
+  - name: VOTE1VALUE
+    value: "sucre"
+  - name: VOTE2VALUE
+    value: "sale"
+  - name: REDIS
+    value: "10.0.102.2"
+    value: "redis-master.redis.svc.cluster.local"
+  - name: redis_server
+    value: "redis-master.redis.svc.cluster.local"
+  - name: REDIS_PWD
+    value: "plop"

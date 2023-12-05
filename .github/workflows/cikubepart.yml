@@ -1,0 +1,49 @@
+name: release
+
+on:
+    workflow_dispatch:
+    push:
+     branches:
+      - main
+jobs:
+    terraform:
+        runs-on: ubuntu-latest
+        steps:
+
+        - uses: actions/checkout@v3
+      
+        - name: Install python 3.8
+          uses: actions/setup-python@v2
+          with:
+            python-version: 3.8
+        - name: isntall dependencies
+          run: |
+            python -m pip install --upgrade pip
+            pip install azure-cli
+        - name: login to azure
+          run: |
+            az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+        
+        - name: helm install
+          run: pip install helm
+        - name: terraform init and validate
+          run: |
+            cd Terraform 
+            terraform init
+            terraform validate
+        
+        - name: humanvalidation
+          run: |
+               approvers: iSkysan
+               minimum_approvals: 1
+               issue-title: "approuver terraform"
+                issue-body: "approuver terraform apply"
+                exclude-workflow-initiator-as-approver: false
+
+        - name: terraform apply
+          run: terraform apply -auto-approve
+
+        - name: helm install
+          run: |
+                cd ..
+                helm delete --kubeconfig .kube/config vote-app ../kubepart/deploy-app/
